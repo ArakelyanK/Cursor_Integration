@@ -1,4 +1,4 @@
 {
   "name": "HubEx Teams",
-  "install": "node -v && npm install -g @azure-devops/mcp && test -f scripts/create-hubex-bug.mjs"
+  "install": "npm install --prefix \"$HOME/.local\" @azure-devops/mcp@2.10.0\nnode --check scripts/create-hubex-bug.mjs\nnode --check scripts/extract-teams-thread.mjs\nnode --check scripts/load-dev-env.mjs\nnode --check scripts/hubex-api.mjs\nnode --check scripts/sync-dev-env.mjs\nnode \"$HOME/.local/node_modules/@azure-devops/mcp/dist/index.js\" --version"
 }

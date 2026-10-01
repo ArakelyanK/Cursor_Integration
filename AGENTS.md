@@ -1,3 +1,11 @@
+## Cursor Cloud specific instructions
+
+- В репозитории нет `package.json` и долгоживущих сервисов. Runtime — Node.js из базового образа.
+- Установка (идемпотентна): `npm install --prefix "$HOME/.local" @azure-devops/mcp@2.10.0`. Глобальный `npm install -g` недоступен: prefix npm — `/`. Затем `node --check` для `scripts/*.mjs` и `node "$HOME/.local/node_modules/@azure-devops/mcp/dist/index.js" --version`. Это же делает `install` в `.cursor/environment.json`.
+- Локальная проверка без секретов: `node scripts/extract-teams-thread.mjs --text "parentMessageId=1700000000001"` — печатает JSON со ссылкой на канал Support.
+- `AZURE_DEVOPS_PAT` — секрет Cloud Agent для MCP `ado` в рантайме. В git и в `environment.json` его не класть. Для проверки окружения секрет не нужен.
+- `scripts/hubex-api.mjs` и `scripts/repro_web.py` против HubEx DEV в проверке окружения не запускать.
+
 # Язык общения
 
 Всегда отвечай пользователю на русском языке, если он явно не попросил другой язык.
