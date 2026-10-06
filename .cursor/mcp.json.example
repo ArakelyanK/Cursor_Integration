@@ -3,9 +3,9 @@
     "ado": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y", "@azure-devops/mcp", "melston", "--authentication", "pat"],
+      "args": ["-y", "@azure-devops/mcp", "melston", "--authentication", "envvar"],
       "env": {
-        "PERSONAL_ACCESS_TOKEN": "${env:AZURE_DEVOPS_PAT}"
+        "ADO_MCP_AUTH_TOKEN": "${env:AZURE_DEVOPS_PAT}"
       }
     }
   }
