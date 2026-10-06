@@ -90,12 +90,13 @@ MCP Azure DevOps (обязателен) + секрет AZURE_DEVOPS_PAT
 
 ## Шаг 5. MCP Azure DevOps — указать свой токен
 
-MCP настраивается **у вас в Cursor**, не копируется из репозитория как готовый доступ.  
+MCP настраивается **у вас в Cursor**, не копируется из репозитория как готовый доступ. Cloud Agent **не** читает `.cursor/mcp.json` из git: нужен User MCP в [cursor.com/agents](https://cursor.com/agents) → MCP.
 
+Toggle «включён» только запускает процесс. Без `--authentication envvar` и без `ADO_MCP_AUTH_TOKEN` сервер идёт в interactive login, в Cloud VM это даёт identity `aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa` и 401.
 
 1. Откройте [cursor.com/agents](https://cursor.com/agents) → MCP
   или [Integrations](https://cursor.com/dashboard/integrations) → MCP.
-2. **Add custom MCP**.
+2. **Add custom MCP** (или **Edit** уже существующего `ado` / `Ado`).
 3. Транспорт: **stdio** (command).
   Не HTTP и не `https://mcp.dev.azure.com/...` — через Entra ID в Cursor это не залогинится.
 4. Вставьте конфиг. Токен — **только** ссылка на ваш секрет из шага 4, не строка из git:
@@ -106,18 +107,20 @@ MCP настраивается **у вас в Cursor**, не копируетс�
     "ado": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y", "@azure-devops/mcp", "melston", "--authentication", "pat"],
+      "args": ["-y", "@azure-devops/mcp", "melston", "--authentication", "envvar"],
       "env": {
-        "PERSONAL_ACCESS_TOKEN": "${env:AZURE_DEVOPS_PAT}"
+        "ADO_MCP_AUTH_TOKEN": "${env:AZURE_DEVOPS_PAT}"
       }
     }
   }
 }
 ```
 
-`${env:AZURE_DEVOPS_PAT}` подставляет секрет **вашего** Cloud Agent. Если секрета нет — MCP не возьмёт токен из репозитория (его там нет).
+`${env:AZURE_DEVOPS_PAT}` подставляет секрет **вашего** Cloud Agent. Если интерполяция в dropdown не сработала — вставьте **значение** PAT в поле `env.ADO_MCP_AUTH_TOKEN` (Cursor шифрует `env` и не показывает его обратно). Не кладите PAT в git.
 
-5. Сохраните. В списке MCP сервер `ado` должен быть **включён** (toggle). Нужен **новый** прогон агента.
+Режим `--authentication pat` **не** подходит для сырого секрета: там `PERSONAL_ACCESS_TOKEN` должен быть `base64(email:pat)`, а не сам PAT.
+
+5. Сохраните. В списке MCP сервер `ado` должен быть **включён** (toggle). Нужен **новый** прогон агента: уже запущенный VM секреты и env MCP не подхватит.
 
 Шаблон: `.cursor/mcp.json.example`. Рабочий `.cursor/mcp.json` в git не хранится (у Desktop может быть свой путь к Node).
 
@@ -193,7 +196,7 @@ MCP настраивается **у вас в Cursor**, не копируетс�
 | Нет карточки / не стартует     | Шаги 2 и 6: Cloud Agents, Teams Connect, `@Cursor help`                    |
 | Просит открыть Web или Desktop | Писать в **треде канала**                                                  |
 | «AZURE_DEVOPS_PAT is missing»  | Шаги 3–4: **свой** PAT в Secrets, имя точно `AZURE_DEVOPS_PAT`             |
-| MCP не логинится / 401 / HTML логина Azure / «placeholder» | Шаг 5: `ado` включён; Env `PERSONAL_ACCESS_TOKEN` = `${env:AZURE_DEVOPS_PAT}`. Пересохраните MCP. Агент не должен писать PAT в файлы |
+| MCP не логинится / 401 / HTML логина Azure / «placeholder» / user `aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa` | Шаг 5: не только toggle. Args: `--authentication envvar`. Env: `ADO_MCP_AUTH_TOKEN` = `${env:AZURE_DEVOPS_PAT}` или само значение PAT в MCP env. Пересохраните MCP и запустите **новый** агент. Агент не должен писать PAT в файлы |
 | Агент создаёт баг через REST, не через MCP | Шаг 5 не выполнен или MCP выключен у Cloud Agent — включите `ado` и перезапустите |
 | Баг 403                        | У вашей учётки ADO есть права на HubEx, scope Work Items Read & write      |
 | Анализ без кода                | Шаг 5 + у PAT scope **Code Read**                                          |

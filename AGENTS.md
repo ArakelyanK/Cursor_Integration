@@ -37,7 +37,7 @@ Work item и код HubEx — **только инструменты MCP** `ado` 
 | Папка | `repo_file` `action=list_directory` | `repo_list_directory` |
 | Список репо | `repo_repository` `action=list` | `repo_list_repos_by_project` |
 
-Не используй HTTP `mcp.dev.azure.com`. Нужен stdio `@azure-devops/mcp` с PAT: `PERSONAL_ACCESS_TOKEN` = `${env:AZURE_DEVOPS_PAT}`.
+Не используй HTTP `mcp.dev.azure.com`. Нужен stdio `@azure-devops/mcp` с `--authentication envvar` и `ADO_MCP_AUTH_TOKEN` = `${env:AZURE_DEVOPS_PAT}` (сырой PAT). Режим `pat` требует `PERSONAL_ACCESS_TOKEN` = base64(`email:pat`), его не использовать с сырым секретом.
 
 Если вызов вернул HTML логина Azure / «placeholder» — MCP не получил PAT. Напиши это пользователю. **Не** обходи через локальный spawn MCP и файл с токеном.
 
